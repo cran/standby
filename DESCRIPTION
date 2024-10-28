@@ -1,7 +1,7 @@
 Package: standby
 Type: Package
 Title: Alerts, Notifications and Loading Screen in 'Shiny'
-Version: 0.1.0
+Version: 0.2.0
 Authors@R: c(
     person("Aravind", "Hebbali", email = "hebbali.aravind@gmail.com", role = c("aut", "cre")),
     person("Zong", "Bin", role = c("ctb", "cph"), comment = "Author of Three Dots"),
@@ -30,11 +30,11 @@ URL: https://standby.rsquaredacademy.com/,
         https://github.com/rsquaredacademy/standby
 BugReports: https://github.com/rsquaredacademy/standby/issues
 Encoding: UTF-8
-RoxygenNote: 7.1.1
+RoxygenNote: 7.3.2
 VignetteBuilder: knitr
 Config/testthat/edition: 3
 NeedsCompilation: no
-Packaged: 2023-05-23 08:50:39 UTC; HP
+Packaged: 2024-10-28 10:47:20 UTC; HP
 Author: Aravind Hebbali [aut, cre],
   Zong Bin [ctb, cph] (Author of Three Dots),
   Tobias Ahlin [ctb, cph] (Author of SpinKit),
@@ -50,4 +50,4 @@ Author: Aravind Hebbali [aut, cre],
   Marcelo Dolza [ctb, cph] (Author of iziToast)
 Maintainer: Aravind Hebbali <hebbali.aravind@gmail.com>
 Repository: CRAN
-Date/Publication: 2023-05-24 07:50:02 UTC
+Date/Publication: 2024-10-28 11:50:32 UTC

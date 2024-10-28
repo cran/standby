@@ -1,4 +1,4 @@
-## ---- include = FALSE---------------------------------------------------------
+## ----include = FALSE----------------------------------------------------------
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
@@ -23,7 +23,7 @@ knitr::opts_chunk$set(
 #      output$plot1 <- renderPlot({
 #        input$render
 #        Sys.sleep(3)
-#        plot(cars)
+#        hist(mtcars$mpg)
 #      })
 #  
 #  }
