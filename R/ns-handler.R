@@ -2,19 +2,23 @@
 #'
 #' Simple website notifications with effects
 #'
-#' @param message Notification message.
+#' @param message Notification message. Interpreted as HTML. Escape untrusted input with \code{htmltools::htmlEscape()}.
 #' @param type Notification type. Defaults to \code{"notice"}. Other valid values are:
 #' \itemize{
 #' \item \code{"success"}
 #' \item \code{"warning"}
 #' \item \code{"error"}
 #' }
+#'   The notice, success, warning and error types have distinct background and
+#'   foreground colours in every layout.
 #' @param layout Notification layout. Defaults to \code{"growl"}. Other valid values are:
 #' \itemize{
 #' \item \code{"attached"}
 #' \item \code{"bar"}
 #' }
-#' @param effect Notification effect type. Valid values include:
+#' @param effect Notification effect type. The default \code{NULL} selects
+#'   \code{"jelly"} for growl, \code{"flip"} for attached, or \code{"slidetop"}
+#'   for bar. An explicit effect must be valid for the selected layout:
 #' \itemize{
 #' \item For \code{"growl"} layout
 #' \itemize{
@@ -67,12 +71,21 @@
 #' }
 #'
 #' @name notice
-#' @return None
+#' @return \code{useNS()} returns an HTML dependency to include in the UI.
+#'   notice() sends a custom message to the Shiny session for its side effect
+#'   and has no meaningful return value.
 #'
 #' @export
 #'
 notice <- function(message = "Hello", type = "notice", layout = "growl",
-                   effect = "jelly", session = getDefaultReactiveDomain()) {
+                   effect = NULL, session = getDefaultReactiveDomain()) {
+
+  type <- validate_choice(type, c("notice", "success", "warning", "error"), "type")
+  layout <- validate_choice(layout, c("growl", "attached", "bar"), "layout")
+  effects <- switch(layout, growl = c("jelly", "scale", "slide", "genie"),
+    attached = c("flip", "bouncyflip"), bar = c("slidetop", "exploader"))
+  if (is.null(effect)) effect <- effects[[1]]
+  effect <- validate_choice(effect, effects, "effect")
 
   notice = list(
     message = message,

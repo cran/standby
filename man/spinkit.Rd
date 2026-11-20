@@ -28,15 +28,26 @@ spinkit(uiOutput, type = "plane", color = "#333", size = "40px")
 \item wander
 }}
 
-\item{color}{Color of the spinner. Defaults to \code{"#333"}. Choose between hexadecimal, RGB or keyword values.}
+\item{color}{Color of the spinner. Defaults to \code{"#333"}. Choose between a
+color name, hexadecimal, or \code{rgb()}/\code{rgba()}/\code{hsl()}/\code{hsla()}
+values. Names use R's \code{colors()} values; CSS colour names not in R are
+also accepted.}
 
-\item{size}{Size of the spinner. Defaults to \code{"40px"}.}
+\item{size}{Size of the spinner as a positive CSS length. Bare numbers and unitless
+numeric strings are interpreted as pixels. Defaults to \code{"40px"}.}
 }
 \value{
-None
+\code{useSpinkit()} returns a Shiny tag list of HTML dependencies to include in the UI;
+  \code{spinkit()} returns a Shiny tag list wrapping \code{uiOutput}.
 }
 \description{
 Simple CSS spinners.
+}
+\details{
+The supported domain is the listed types, colour formats, and finite
+  positive CSS sizes. The output must have enough room for the requested size.
+  CSS animation must be enabled in a modern browser. Transparent colours
+  intentionally hide the spinner.
 }
 \section{Functions}{
 

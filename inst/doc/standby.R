@@ -5,30 +5,30 @@ knitr::opts_chunk$set(
 )
 
 ## ----example, eval=FALSE------------------------------------------------------
-#  library(shiny)
-#  library(standby)
-#  
-#  ui <- fluidPage(
-#  
-#    standby::useSpinkit(), # include dependencies
-#    fluidRow(
-#      standby::spinkit(plotOutput("plot1")), # wrap output inside loader
-#      actionButton("render", "Render")
-#    )
-#  
-#  )
-#  
-#  server <- function(input, output, session) {
-#  
-#      output$plot1 <- renderPlot({
-#        input$render
-#        Sys.sleep(3)
-#        hist(mtcars$mpg)
-#      })
-#  
-#  }
-#  
-#  shinyApp(ui, server)
+# library(shiny)
+# library(standby)
+# 
+# ui <- fluidPage(
+# 
+#   standby::useSpinkit(), # include dependencies
+#   fluidRow(
+#     standby::spinkit(plotOutput("plot1")), # wrap output inside loader
+#     actionButton("render", "Render")
+#   )
+# 
+# )
+# 
+# server <- function(input, output, session) {
+# 
+#     output$plot1 <- renderPlot({
+#       input$render
+#       Sys.sleep(3)
+#       hist(mtcars$mpg)
+#     })
+# 
+# }
+# 
+# shinyApp(ui, server)
 
 ## ----ref_table, echo=FALSE----------------------------------------------------
 index <- 1:5

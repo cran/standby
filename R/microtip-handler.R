@@ -15,7 +15,8 @@
 #' \item \code{"bottom-left"}
 #' \item \code{"bottom-right"}
 #' }
-#' @param size Size of the tooltip. Defaults to \code{"fit"} as the tooltip will takeup only the size it requires to show the text.
+#' @param size Size of the tooltip. Defaults to \code{NULL}, which fits the text,
+#'   as do \code{"fit"} and \code{""}.
 #' Valid values are:
 #' \itemize{
 #' \item \code{"fit"}
@@ -58,12 +59,18 @@
 #' }
 #'
 #' @name microTip
-#' @return None
+#' @return \code{useMicroTip()} returns a Shiny tag list of HTML dependencies to include in the UI.
+#'   microTip() sends a custom message to the Shiny session for its side effect
+#'   and has no meaningful return value.
 #'
 #' @export
 #'
 microTip <- function(id = NULL, tip = "Hey! tooltip!", position = "top", size = NULL,
                      session = getDefaultReactiveDomain()) {
+
+  position <- validate_choice(position, c("top", "bottom", "left", "right", "top-left",
+    "top-right", "bottom-left", "bottom-right"), "position")
+  size <- validate_choice(size, c("fit", "small", "medium", "large", ""), "size", null = TRUE)
 
   notice = list(
     id       = id,

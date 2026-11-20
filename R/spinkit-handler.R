@@ -18,8 +18,17 @@
 #' \item fold
 #' \item wander
 #' }
-#' @param color Color of the spinner. Defaults to \code{"#333"}. Choose between hexadecimal, RGB or keyword values.
-#' @param size Size of the spinner. Defaults to \code{"40px"}.
+#' @param color Color of the spinner. Defaults to \code{"#333"}. Choose between a
+#'   color name, hexadecimal, or \code{rgb()}/\code{rgba()}/\code{hsl()}/\code{hsla()}
+#'   values. Names use R's \code{colors()} values; CSS colour names not in R are
+#'   also accepted.
+#' @param size Size of the spinner as a positive CSS length. Bare numbers and unitless
+#'   numeric strings are interpreted as pixels. Defaults to \code{"40px"}.
+#'
+#' @details The supported domain is the listed types, colour formats, and finite
+#'   positive CSS sizes. The output must have enough room for the requested size.
+#'   CSS animation must be enabled in a modern browser. Transparent colours
+#'   intentionally hide the spinner.
 #'
 #' @section Functions:
 #' \itemize{
@@ -48,12 +57,28 @@
 #' }
 #'
 #' @name spinkit
-#' @return None
+#' @return \code{useSpinkit()} returns a Shiny tag list of HTML dependencies to include in the UI;
+#'   \code{spinkit()} returns a Shiny tag list wrapping \code{uiOutput}.
 #'
 #' @export
 #'
 spinkit <- function(uiOutput, type = "plane", color = "#333", size = "40px") {
-
+  types <- c("plane", "chase", "bounce", "wave", "pulse", "flow", "swing",
+             "circle", "circle-fade", "grid", "fold", "wander")
+  if (!is.character(type) || length(type) != 1L || is.na(type) || !type %in% types) {
+    stop("`type` must be one of: ", paste(types, collapse = ", "), ".", call. = FALSE)
+  }
+  color <- validate_color(color, "color")
+  color <- normalize_color(color)
+  size <- normalize_css_length(size, name = "size", strict = TRUE)
+  magnitude <- if (is.null(size)) NA_real_ else {
+    number <- regmatches(size, regexpr(sub("\\$$", "", css_number_regex), size, perl = TRUE))
+    suppressWarnings(as.numeric(number))
+  }
+  if (length(magnitude) != 1L || !is.finite(magnitude) || magnitude <= 0) {
+    stop("Invalid `size`: expected a positive CSS length (greater than zero).", call. = FALSE)
+  }
+  id <- generate_id("spinkit")
   base <- switch(type,
                 "plane"       = spinkit_plane(color, size),
                 "chase"       = spinkit_chase(size),
@@ -67,13 +92,24 @@ spinkit <- function(uiOutput, type = "plane", color = "#333", size = "40px") {
                 "grid"        = spinkit_grid(color, size),
                 "fold"        = spinkit_fold(size),
                 "wander"      = spinkit_wander(color, size))
+  if (type == "wander" && !is.null(size)) {
+    base$attribs$style <- paste0(base$attribs$style, " --sk-size: ", size, ";")
+  }
 
-  spin_css <- switch(type,
-                     "chase" = paste0(".sk-chase-dot:before {background-color: ", color, ";}"),
-                     "circle" = paste0(".sk-circle-dot:before {background-color: ", color, ";}"),
-                     "circle-fade" = paste0(".sk-circle-fade-dot:before {background-color: ", color, ";}"),
-                     "fold" = paste0(".sk-fold-cube:before {background-color: ", color, ";}"),
-                     NULL)
+  # Some types colour a pseudo-element in the stylesheet, so the rule has to be
+  # scoped to this widget or the last widget wins for every instance.
+  pseudo_element <- switch(type,
+                           "chase"       = ".sk-chase-dot:before",
+                           "circle"      = ".sk-circle-dot:before",
+                           "circle-fade" = ".sk-circle-fade-dot:before",
+                           "fold"        = ".sk-fold-cube:before",
+                           NULL)
+  spin_css <- if (!is.null(pseudo_element)) {
+    base$attribs$id <- id
+    paste0("#", id, " ", pseudo_element, " {background-color: ", color, ";}")
+  } else {
+    NULL
+  }
 
 
   shiny::tagList(

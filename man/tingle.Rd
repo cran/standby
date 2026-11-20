@@ -17,11 +17,11 @@ tingle(
 )
 }
 \arguments{
-\item{content}{Content of the modal.}
+\item{content}{Content of the modal. Interpreted as HTML. Escape untrusted input with \code{htmltools::htmlEscape()}.}
 
 \item{close_button}{Logical; if \code{TRUE}, displays a button to close the modal. Defaults to \code{FALSE}.}
 
-\item{button_label}{Label of \code{close_button}.}
+\item{button_label}{Label of \code{close_button}. Interpreted as HTML. Escape untrusted input with \code{htmltools::htmlEscape()}.}
 
 \item{button_type}{Type of button. Defaults to \code{"default"}. Other valid values are:
 \itemize{
@@ -38,7 +38,9 @@ tingle(
 \item{session}{Shiny session object.}
 }
 \value{
-None
+\code{useTingle()} returns an HTML dependency to include in the UI.
+  tingle() sends a custom message to the Shiny session for its side effect
+  and has no meaningful return value.
 }
 \description{
 Minimalist and easy to use modals.

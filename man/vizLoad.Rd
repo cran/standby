@@ -31,16 +31,17 @@ vizLoad(
 \item bordered_line
 }}
 
-\item{size}{The size of the bar/spinner. Valid values are:
-\itemize{
-\item large
-\item medium
-\item small
-\item tiny
-\item fluid
-}}
+\item{size}{The size of the bar/spinner. For \code{"line"} and \code{"bordered_line"},
+valid values are \code{"large"}, \code{"medium"}, \code{"small"}, and \code{"fluid"}.
+For all other types, valid values are \code{"large"}, \code{"medium"}, \code{"small"},
+and \code{"tiny"}.
+Supply one non-missing character string. Line widths are capped at the output
+width when the nominal preset is larger than its container.}
 
-\item{color}{The color of the bar/spinner. Choose between hexadecimal, RGB or keyword values.}
+\item{color}{The color of the bar/spinner. Choose between a color name,
+hexadecimal, or \code{rgb()}/\code{rgba()}/\code{hsl()}/\code{hsla()} values.
+Names use R's \code{colors()} values; CSS colour names not in R are also
+accepted.}
 
 \item{add_label}{Logical; if \code{TRUE}, displays a label below the bar/spinner. Defaults to \code{FALSE}.}
 
@@ -48,10 +49,16 @@ vizLoad(
 be set to \code{TRUE} to display the label.}
 }
 \value{
-None
+\code{useVizLoad()} returns a Shiny tag list of HTML dependencies to include in the UI;
+  \code{vizLoad()} returns a Shiny tag list wrapping \code{uiOutput}.
 }
 \description{
 Loading bars and spinners.
+}
+\details{
+The supported domain is the listed type/size combinations and colour
+  formats, with CSS animation enabled in a modern browser and sufficient room
+  for the chosen graphic. Transparent colours intentionally hide the graphic.
 }
 \section{Functions}{
 

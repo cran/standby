@@ -2,8 +2,10 @@
 #'
 #' Beautiful notifications and prompts.
 #'
-#' @param title Title of the notice. It can be a string, an element or \code{FALSE} (the default) for no title.
-#' @param text Text of the notice. It can be a string, an element or \code{FALSE} (the default) for no text.
+#' @param title Title of the notice. Defaults to \code{"Hey"}. It can be a string, an element or \code{FALSE} for no title.
+#'   Tag objects are rendered to HTML; HTML dependencies attached to them are not installed.
+#' @param text Text of the notice. Defaults to \code{NULL}. It can be a string, an element or \code{FALSE} for no text.
+#'   Tag objects are rendered to HTML; HTML dependencies attached to them are not installed.
 #' @param type Type of notice. Defaults to \code{"notice"}. Other valid values are:
 #' \itemize{
 #' \item \code{"info"}
@@ -11,7 +13,8 @@
 #' \item \code{"error"}
 #' }
 #' @param icon Logical; if \code{TRUE} (the default), default icon is displayed. No icon is displayed if set to \code{FALSE}.
-#' @param delay Delay in milliseconds before the notice is removed. If set to \code{"infinity"}, the notice will not close.
+#'   A string specifying custom icon classes is also accepted.
+#' @param delay Delay in milliseconds before the notice is removed. If set to \code{"infinity"} (or \code{Inf}), the notice will not close.
 #' @param hide Logical; if \code{TRUE} (the default), notice is closed after \code{delay} specified in milliseconds.
 #' @param sticker Logical; if \code{TRUE} (the default), provides a button for the user to manually stick the notice.
 #' @param closer Logical; if \code{TRUE} (the default), provides a button for the user to manually close the notice.
@@ -25,12 +28,14 @@
 #' \item \code{"normal"}: 250ms
 #' \item \code{"fast"}: 100ms
 #' }
-#' @param width Width of the notice. Default is \code{"360px"}.
-#' @param min_height Minimum height of the notice. Default is \code{"16px"}. It will expand to fit the content.
+#' @param width Width of the notice. Default is \code{"360px"}. Bare numbers are interpreted as pixels.
+#' @param min_height Minimum height of the notice. Default is \code{"16px"}. It will expand to fit the content. Bare numbers are interpreted as pixels.
 #' @param max_text_height Maximum height of the text container. Default is \code{"200px"}. If the text goes beyond
-#' this height, scrollbars will appear. Use \code{NULL} to remove this restriction.
+#' this height, scrollbars will appear. Use \code{NULL} to remove this restriction. Bare numbers are interpreted as pixels.
 #' @param translucent Logical; if \code{TRUE}, creates see through notice. Defaults to \code{FALSE}.
-#' @param non_blocking Logical; if \code{TRUE}, notice fades to show elements underneath. Defaults to \code{FALSE}.
+#' @param non_blocking Logical; if \code{TRUE}, the notice body passes pointer
+#'   events to elements underneath and fades while the pointer is over it.
+#'   Close and sticker controls remain interactive. Defaults to \code{FALSE}.
 #' @param session Shiny session object.
 #'
 #' @section Functions:
@@ -64,7 +69,9 @@
 #' }
 #'
 #' @name notify
-#' @return None
+#' @return \code{useNotify()} returns an HTML dependency to include in the UI.
+#'   notify() sends a custom message to the Shiny session for its side effect
+#'   and has no meaningful return value.
 #'
 #' @export
 #'
@@ -76,9 +83,51 @@ notify <- function(title = "Hey", text = NULL, type = "notice", icon = TRUE,
                    translucent = FALSE, non_blocking = FALSE,
                    session = getDefaultReactiveDomain()) {
 
+  type <- validate_choice(type, c("notice", "info", "success", "error"), "type")
+  animation <- validate_choice(animation, c("none", "fade"), "animation")
+  animate_speed <- validate_choice(animate_speed, c("slow", "normal", "fast"), "animate_speed")
+  icon <- unname(icon)
+  if (!(is.character(icon) && length(icon) == 1L && !is.na(icon))) {
+    icon <- validate_flag(icon, "icon")
+  }
+  hide <- validate_flag(hide, "hide")
+  sticker <- validate_flag(sticker, "sticker")
+  closer <- validate_flag(closer, "closer")
+  shadow <- validate_flag(shadow, "shadow")
+  mouse_reset <- validate_flag(mouse_reset, "mouse_reset")
+  translucent <- validate_flag(translucent, "translucent")
+  non_blocking <- validate_flag(non_blocking, "non_blocking")
+  if (!is_infinite_delay(delay)) delay <- normalize_delay(delay, "delay")
+  # PNotify applies dimensions only when they are strings. Keep CSS expressions
+  # (including auto/calc/var) and normalize bare numbers consistently with toast.
+  width <- normalize_css_length(width, "width")
+  min_height <- normalize_css_length(min_height, "min_height")
+  max_text_height <- normalize_css_length(max_text_height, "max_text_height")
+
+  # An omitted title/text must not reach PNotify as JSON null, which it would
+  # render as the literal word "null". FALSE is its documented "none" value.
+  if (is.null(title)) title <- FALSE
+  if (is.null(text)) text <- FALSE
+
+  # Shiny serialises a tag as an object, which PNotify would render as
+  # "[object Object]". Render tags to HTML and mark only those as trusted.
+  title_is_html <- inherits(title, c("shiny.tag", "shiny.tag.list", "html"))
+  text_is_html <- inherits(text, c("shiny.tag", "shiny.tag.list", "html"))
+  if (title_is_html) title <- as.character(htmltools::as.tags(title))
+  if (text_is_html) text <- as.character(htmltools::as.tags(text))
+
+  # "infinity" is documented as "never close"; PNotify only understands the
+  # JavaScript numeric Infinity, so disable automatic hiding instead.
+  if (is_infinite_delay(delay)) {
+    delay <- 8000
+    hide <- FALSE
+  }
+
   notice = list(
     title         = title,
+    titleTrusted  = title_is_html,
     text          = text,
+    textTrusted   = text_is_html,
     type          = type,
     icon          = icon,
     delay         = delay,
@@ -99,7 +148,7 @@ notify <- function(title = "Hey", text = NULL, type = "notice", icon = TRUE,
   }
 
   if (non_blocking) {
-    notice$addModelessClass = "nonblock"
+    notice$addModelessClass = "sby-nonblocking"
   }
 
   session$sendCustomMessage(

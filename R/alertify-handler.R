@@ -2,16 +2,19 @@
 #'
 #' Pretty browser alerts and notifications.
 #'
-#' @param title Dialog title.
-#' @param message Dialog contents.
-#' @param type Dialog type. Defaults to \code{"success"}. Valid values are:
+#' @param title Dialog title. Interpreted as HTML. Escape untrusted input with \code{htmltools::htmlEscape()}.
+#' @param message Dialog contents. Interpreted as HTML. Escape untrusted input with \code{htmltools::htmlEscape()}.
+#' @param type Alert/notification type. Defaults to \code{"success"}. Valid values are:
 #' \itemize{
 #' \item \code{"success"}
 #' \item \code{"error"}
 #' \item \code{"warning"}
 #' \item \code{"message"}
 #' }
-#' @param btn_label The \code{OK} button label.
+#' For \code{alertify_alert()} the type sets a class on the dialog and a
+#' type-specific accent border and header colour. For
+#' \code{alertify_notify()} it sets the notification style.
+#' @param btn_label The \code{OK} button label. Interpreted as HTML. Escape untrusted input with \code{htmltools::htmlEscape()}.
 #' @param transition Transition effect to be used when showing/hiding the dialog. Defaults to \code{"pulse"}. Valid values are:
 #' \itemize{
 #' \item \code{"pulse"}
@@ -21,7 +24,10 @@
 #' \item \code{"flipx"}
 #' \item \code{"flipy"}
 #' }
-#' @param delay The time (in seconds) to wait before the notification is auto-dismissed. \code{0} will keep notification open till clicked.
+#' @param delay The time (in seconds) to wait before the notification is auto-dismissed. \code{0}, \code{Inf}, or \code{NULL} will keep notification open till clicked.
+#'   The strings \code{"infinity"} and \code{"infinite"} also keep it open.
+#'   For compatibility, \code{FALSE}, \code{NA}, \code{NaN}, \code{-Inf},
+#'   and negative numeric delays also keep the notification open.
 #' @param position Position of the notification. Defaults to \code{"bottom-right"}. Valid values are:
 #' \itemize{
 #' \item \code{"bottom-right"}
@@ -33,15 +39,15 @@
 #' }
 #' @param transition_off Logical; if \code{TRUE}, transition effect is disabled. Defaults to \code{FALSE}.
 #' @param closable Logical; if \code{TRUE} (the default), a \code{Close} button is displayed in the header of the dialog.
-#' @param auto_reset Logical; if \code{TRUE} (the default), the dialog will reset size/position on window resize.
+#' @param auto_reset Logical; if \code{TRUE}, the dialog will reset size/position on window resize. Defaults to \code{FALSE}.
 #' @param frameless Logical; if \code{TRUE}, hides both header and footer of the dialog. Defaults to \code{FALSE}.
-#' @param maximizable Logical; if \code{TRUE} (the default), the \code{Maximize} button is displayed in the header of the dialog.
-#' @param modal Logical; if \code{TRUE} (the default), a screen dimmer will be used and access to the page contents will be prevented.
-#' @param movable Logical; if \code{TRUE} (the default), the dialog is movable.
-#' @param move_bounded Logical; if \code{TRUE}, the dialog is not allowed to go off-screen. Defaults to \code{FALSE}.
-#' @param overflow Logical; if \code{TRUE} (the default), the content overflow is managed by the dialog
+#' @param maximizable Logical; if \code{TRUE}, the \code{Maximize} button is displayed in the header of the dialog. Defaults to \code{FALSE}.
+#' @param modal Logical; if \code{TRUE}, a screen dimmer will be used and access to the page contents will be prevented. Defaults to \code{FALSE}.
+#' @param movable Logical; if \code{TRUE}, the dialog is movable. Defaults to \code{FALSE}.
+#' @param move_bounded Logical; if \code{TRUE} (the default), the dialog is not allowed to go off-screen.
+#' @param overflow Logical; if \code{TRUE}, the content overflow is managed by the dialog. Defaults to \code{FALSE}.
 #' @param padding Logical; if \code{TRUE} (the default), the content padding is managed by the dialog.
-#' @param pinnable Logical; if \code{TRUE} (the default), the \code{Pin} button is displayed in the header of the dialog.
+#' @param pinnable Logical; if \code{TRUE}, the \code{Pin} button is displayed in the header of the dialog. Defaults to \code{FALSE}.
 #' @param resizeable Logical; if \code{TRUE}, the dialog is resizable. Defaults to \code{FALSE}.
 #' @param start_maximized Logical; if \code{TRUE}, the dialog will start in a maximized state. Defaults to \code{FALSE}.
 #' @param session Shiny session object.
@@ -104,7 +110,9 @@
 #' }
 #'
 #' @name alertify
-#' @return None
+#' @return \code{useAlertify()} returns an HTML dependency to include in the UI.
+#'   alertify_alert() and alertify_notify() send a custom message to the Shiny session for its side effect
+#'   and have no meaningful return value.
 #'
 NULL
 
@@ -120,6 +128,22 @@ alertify_alert <- function(title = "Alert Title", message = "Alert Message",
                            overflow = FALSE, padding = TRUE, pinnable = FALSE,
                            resizeable = FALSE, start_maximized = FALSE,
                            session = getDefaultReactiveDomain()) {
+
+  type <- validate_choice(type, c("success", "error", "warning", "message"), "type")
+  transition <- validate_choice(transition, c("pulse", "slide", "zoom", "fade", "flipx", "flipy"), "transition")
+  transition_off <- validate_flag(transition_off, "transition_off")
+  closable <- validate_flag(closable, "closable")
+  auto_reset <- validate_flag(auto_reset, "auto_reset")
+  frameless <- validate_flag(frameless, "frameless")
+  maximizable <- validate_flag(maximizable, "maximizable")
+  modal <- validate_flag(modal, "modal")
+  movable <- validate_flag(movable, "movable")
+  move_bounded <- validate_flag(move_bounded, "move_bounded")
+  overflow <- validate_flag(overflow, "overflow")
+  padding <- validate_flag(padding, "padding")
+  pinnable <- validate_flag(pinnable, "pinnable")
+  resizeable <- validate_flag(resizeable, "resizeable")
+  start_maximized <- validate_flag(start_maximized, "start_maximized")
 
   notice = list(
     title          = title,
@@ -154,6 +178,13 @@ alertify_alert <- function(title = "Alert Title", message = "Alert Message",
 alertify_notify <- function(message = "Alert Message", type = "success",
                             delay = 5, position = "bottom-right",
                             session = getDefaultReactiveDomain()) {
+
+  type <- validate_choice(type, c("success", "error", "warning", "message"), "type")
+  position <- validate_choice(position, c("bottom-right", "bottom-left", "bottom-center",
+    "top-right", "top-left", "top-center"), "position")
+  # Alertify deliberately keeps notifications open for non-positive delays.
+  if (is.null(delay) || is_stay_open_delay(delay)) delay <- 0
+  delay <- normalize_delay(delay, "delay", negative = TRUE)
 
   notice = list(
     message  = message,

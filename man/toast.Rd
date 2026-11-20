@@ -24,7 +24,7 @@ toast(
   message_size = NULL,
   message_line_height = NULL,
   image = NULL,
-  image_width = NULL,
+  image_width = "50px",
   zindex = 99999,
   layout = 1,
   balloon = FALSE,
@@ -47,9 +47,9 @@ toast(
 )
 }
 \arguments{
-\item{title}{Title of the toast.}
+\item{title}{Title of the toast. Interpreted as HTML. Escape untrusted input with \code{htmltools::htmlEscape()}.}
 
-\item{message}{Message of toast.}
+\item{message}{Message of toast. Interpreted as HTML. Escape untrusted input with \code{htmltools::htmlEscape()}.}
 
 \item{type}{Type of notification. Defaults to \code{NULL}. Valid values are:
 \itemize{
@@ -57,11 +57,15 @@ toast(
 \item \code{"success"}
 \item \code{"warning"}
 \item \code{"error"}
+\item \code{"question"}
 }}
 
-\item{theme}{Theme of toast. Choose between \code{"light"} or \code{"dark"}.}
+\item{theme}{Theme of toast: \code{"light"}, \code{"dark"}, or a custom theme
+name used as the suffix of the \code{iziToast-theme-} class. Must be one
+non-NA string without whitespace or quotes; \code{NULL} or \code{""} uses
+the default theme.}
 
-\item{position}{Where toast will be shown. Defaults to \code{"bottomRight"}. Valid values are:
+\item{position}{Where toast will be shown. Defaults to \code{"center"}. Valid values are:
 \itemize{
 \item \code{"bottomRight"}
 \item \code{"bottomLeft"}
@@ -72,7 +76,10 @@ toast(
 \item \code{"center"}
 }}
 
-\item{duration}{Time in milliseconds to close the toast. Defaults to \code{5000}. Use \code{FALSE} to disable.}
+\item{duration}{Time in milliseconds to close the toast. Defaults to \code{5000}. Use \code{FALSE}, \code{Inf}, or \code{NULL} to disable.
+The strings \code{"infinity"} and \code{"infinite"} also disable closing.
+For compatibility, \code{0}, \code{NA}, \code{NaN}, and \code{-Inf}
+also keep the toast open.}
 
 \item{progress_bar_color}{Progress bar color. Choose between hexadecimal, RGB or keyword values.}
 
@@ -82,23 +89,24 @@ toast(
 
 \item{title_color}{Title color. Choose between hexadecimal, RGB or keyword values.}
 
-\item{title_size}{Title font size.}
+\item{title_size}{Title font size. A bare number is interpreted as pixels.}
 
-\item{title_line_height}{Title line height.}
+\item{title_line_height}{Title line height. A bare number is interpreted as pixels.}
 
 \item{message_color}{Message color. Choose between hexadecimal, RGB or keyword values.}
 
-\item{message_size}{Message font size.}
+\item{message_size}{Message font size. A bare number is interpreted as pixels.}
 
-\item{message_line_height}{Message line height.}
+\item{message_line_height}{Message line height. A bare number is interpreted as pixels.}
 
 \item{image}{Cover image.}
 
-\item{image_width}{Width of cover image. Defaults to \code{"50px"}.}
+\item{image_width}{Width of cover image. Defaults to \code{"50px"}. A bare
+number is interpreted as pixels.}
 
 \item{zindex}{The z-index CSS attribute of the toast. Defaults to \code{99999}.}
 
-\item{layout}{Size of the toast. Choose between \code{1} or \code{2}.}
+\item{layout}{Size of the toast. Choose between \code{1}, \code{2}, or \code{3}.}
 
 \item{balloon}{Logical; if \code{TRUE}, applies a balloon like toast. Defaults to \code{FALSE}.}
 
@@ -113,7 +121,9 @@ toast(
 \item{display_mode}{Rules to show multiple toasts. Default is \code{0}. Valid values are:
 \itemize{
 \item \code{0}: Waits until the current toast is closed before displaying a new one.
-\item \code{1}: Replaces the current toast with the new toast toast.
+\item \code{1}: Replaces the toast(s) currently displayed with the new toast.
+\item \code{2}: Replaces only a displayed toast with the same title, message
+  and text colour. The identity is derived by iziToast.
 }}
 
 \item{drag_to_close}{Logical; if \code{TRUE} (the default), toast can be closed by dragging it.}
@@ -144,7 +154,10 @@ toast(
 \item \code{"fadeInLeft"}
 \item \code{"fadeInRight"}
 \item \code{"flipInX"}
-}}
+\item \code{"revealIn"}
+\item \code{"slideIn"}
+}
+Use \code{NULL} or \code{""} for no open animation.}
 
 \item{transition_out}{Toast close animation. Defaults to \code{"fadeOut"}. Valid values are:
 \itemize{
@@ -154,12 +167,15 @@ toast(
 \item \code{"fadeOutLeft"}
 \item \code{"fadeOutRight"}
 \item \code{"flipOutX"}
-}}
+}
+Use \code{NULL} or \code{""} for no close animation.}
 
 \item{session}{Shiny session object.}
 }
 \value{
-None
+\code{useToast()} returns an HTML dependency to include in the UI.
+  toast() sends a custom message to the Shiny session for its side effect
+  and has no meaningful return value.
 }
 \description{
 Lightweight toast notifications

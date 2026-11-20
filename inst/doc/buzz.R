@@ -5,26 +5,26 @@ knitr::opts_chunk$set(
 )
 
 ## ----example, eval=FALSE------------------------------------------------------
-#  library(shiny)
-#  library(standby)
-#  
-#  ui <- fluidPage(
-#  
-#    useToast(), # include dependencies
-#    actionButton(inputId = "btn",
-#                 label   = "iziToast Demo")
-#  
-#  )
-#  
-#  server <- function(input, output, session) {
-#  
-#    observeEvent(input$btn, {
-#      # display toast notification
-#      toast("Hey there!", "Thank you for exploring buzz!")
-#    })
-#  }
-#  
-#  shinyApp(ui, server)
+# library(shiny)
+# library(standby)
+# 
+# ui <- fluidPage(
+# 
+#   useToast(), # include dependencies
+#   actionButton(inputId = "btn",
+#                label   = "iziToast Demo")
+# 
+# )
+# 
+# server <- function(input, output, session) {
+# 
+#   observeEvent(input$btn, {
+#     # display toast notification
+#     toast("Hey there!", "Thank you for exploring standby!")
+#   })
+# }
+# 
+# shinyApp(ui, server)
 
 ## ----ref_table, echo=FALSE----------------------------------------------------
 index <- 1:8

@@ -1,27 +1,38 @@
 /* Alertify */
 Shiny.addCustomMessageHandler((type = 'alertify.alert'), function (message) {
-  alertify
+  var dialog = alertify
     .alert()
     .setting({
       title: message.title,
       message: message.message,
+      label: message.label,
       autoReset: message.autoReset,
       closable: message.closable,
       frameless: message.frameless,
-      maximiable: message.maximiable,
+      maximizable: message.maximizable,
       modal: message.modal,
       movable: message.movable,
       moveBounded: message.moveBounded,
       overflow: message.overflow,
       padding: message.padding,
       pinnable: message.pinnable,
-      resizeable: message.resizeable,
+      resizable: message.resizeable,
       startMaximized: message.startMaximized,
       transition: message.transition,
       transitionOff: message.transitionOff,
       onok: function () {},
     })
     .show();
+
+  // Give the dialog a defined type: a class plus a type-specific border and
+  // header colour (see css/sbyAlertify.css).
+  if (dialog && dialog.elements && dialog.elements.dialog) {
+    var el = dialog.elements.dialog;
+    var known = ['success', 'warning', 'error', 'message'];
+    var dialogType = known.indexOf(message.type) === -1 ? 'message' : message.type;
+    known.forEach(function (type) { el.classList.remove('sby-alert-' + type); });
+    el.classList.add('sby-alert', 'sby-alert-' + dialogType);
+  }
 });
 
 Shiny.addCustomMessageHandler((type = 'alertify.notify'), function (message) {

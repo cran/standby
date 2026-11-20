@@ -4,7 +4,7 @@ useNS <- function() {
 
   htmltools::htmlDependency(
     name = "ns",
-    version = "0.1.0",
+    version = "0.2.2",
     src = c(file = "ns"),
     script = list(list(src = "js/modernizr.custom.js", defer = NA),
                   list(src = "js/classie.js", defer = NA),
@@ -14,7 +14,8 @@ useNS <- function() {
                       "css/ns-default.css",
                       "css/ns-style-growl.css",
                       "css/ns-style-attached.css",
-                      "css/ns-style-bar.css"),
+                      "css/ns-style-bar.css",
+                      "css/sbyNS.css"),
     package = "standby"
   )
 }

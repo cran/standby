@@ -11,19 +11,21 @@ notice(
   message = "Hello",
   type = "notice",
   layout = "growl",
-  effect = "jelly",
+  effect = NULL,
   session = getDefaultReactiveDomain()
 )
 }
 \arguments{
-\item{message}{Notification message.}
+\item{message}{Notification message. Interpreted as HTML. Escape untrusted input with \code{htmltools::htmlEscape()}.}
 
 \item{type}{Notification type. Defaults to \code{"notice"}. Other valid values are:
 \itemize{
 \item \code{"success"}
 \item \code{"warning"}
 \item \code{"error"}
-}}
+}
+  The notice, success, warning and error types have distinct background and
+  foreground colours in every layout.}
 
 \item{layout}{Notification layout. Defaults to \code{"growl"}. Other valid values are:
 \itemize{
@@ -31,7 +33,9 @@ notice(
 \item \code{"bar"}
 }}
 
-\item{effect}{Notification effect type. Valid values include:
+\item{effect}{Notification effect type. The default \code{NULL} selects
+  \code{"jelly"} for growl, \code{"flip"} for attached, or \code{"slidetop"}
+  for bar. An explicit effect must be valid for the selected layout:
 \itemize{
 \item For \code{"growl"} layout
 \itemize{
@@ -55,7 +59,9 @@ notice(
 \item{session}{Shiny session object.}
 }
 \value{
-None
+\code{useNS()} returns an HTML dependency to include in the UI.
+  notice() sends a custom message to the Shiny session for its side effect
+  and has no meaningful return value.
 }
 \description{
 Simple website notifications with effects

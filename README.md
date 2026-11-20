@@ -11,7 +11,6 @@ checks](https://badges.cranchecks.info/summary/standby.svg)](https://cran.r-proj
 [![R-CMD-check](https://github.com/rsquaredacademy/standby/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/rsquaredacademy/standby/actions/workflows/R-CMD-check.yaml)
 [![Codecov test
 coverage](https://codecov.io/gh/rsquaredacademy/standby/branch/master/graph/badge.svg)](https://app.codecov.io/gh/rsquaredacademy/standby?branch=master)
-[![status](https://tinyverse.netlify.com/badge/standby)](https://CRAN.R-project.org/package=standby)
 [![Lifecycle:
 stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html)
 <!-- badges: end -->
@@ -86,13 +85,13 @@ with references:
 
 ### Alerts and Notifications
 
-To use alerts or notifications from **buzz** in your Shiny application,
+To use alerts or notifications from **standby** in your Shiny application,
 follow the below steps:
 
 - Include the dependencies in the **UI** part of the app using the
-  appropriate `use*` functions (`useToast()` in the below example).
+  appropriate `use*` functions (`useBootBox()` in the below example).
 - Include the corresponding rendering function in the **Server** part of
-  the app (`toast()` in the below example).
+  the app (`bootBox()` in the below example).
 
 ##### Example
 
@@ -105,7 +104,7 @@ ui <- fluidPage(
                label   = "Show Notification")
 )
 server <- function(input, output, session) {
-  observeEvent(input$pnotify, {
+  observeEvent(input$notify, {
     bootBox(class = "rubberBand") # display the alert
   })
 }
@@ -141,3 +140,5 @@ Please note that the standby project is released with a [Contributor
 Code of
 Conduct](https://contributor-covenant.org/version/2/1/CODE_OF_CONDUCT.html).
 By contributing to this project, you agree to abide by its terms.
+
+<div data-rsa-signup data-site="standby.rsquaredacademy.com" data-privacy-url="https://www.rsquaredacademy.com/privacy-policy.html"></div>

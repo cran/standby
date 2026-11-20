@@ -1,9 +1,9 @@
 Package: standby
 Type: Package
 Title: Alerts, Notifications and Loading Screen in 'Shiny'
-Version: 0.2.0
+Version: 0.2.2
 Authors@R: c(
-    person("Aravind", "Hebbali", email = "hebbali.aravind@gmail.com", role = c("aut", "cre")),
+    person("Aravind", "Hebbali", email = "aravindhebbali@rsquaredacademy.com", role = c("aut", "cre")),
     person("Zong", "Bin", role = c("ctb", "cph"), comment = "Author of Three Dots"),
     person("Tobias", "Ahlin", role = c("ctb", "cph"), comment = "Author of SpinKit"),
     person("https://github.com/RIDICS", role = c("ctb", "cph"), comment = "CSS loader code"),
@@ -24,17 +24,18 @@ Description: Easily create alerts, notifications, modals, info tips and loading
     the output is being recalculated.
 Depends: R(>= 3.3)
 Imports: grDevices, htmltools, shiny
-Suggests: rmarkdown, kableExtra, knitr, testthat (>= 3.0.0), covr
+Suggests: rmarkdown, kableExtra, knitr, testthat (>= 3.1.5), jsonlite,
+        chromote, covr
 License: GPL (>= 3)
 URL: https://standby.rsquaredacademy.com/,
         https://github.com/rsquaredacademy/standby
 BugReports: https://github.com/rsquaredacademy/standby/issues
 Encoding: UTF-8
-RoxygenNote: 7.3.2
 VignetteBuilder: knitr
 Config/testthat/edition: 3
+Config/roxygen2/version: 8.1.1
 NeedsCompilation: no
-Packaged: 2024-10-28 10:47:20 UTC; HP
+Packaged: 2026-11-20 03:23:46 UTC; DELL
 Author: Aravind Hebbali [aut, cre],
   Zong Bin [ctb, cph] (Author of Three Dots),
   Tobias Ahlin [ctb, cph] (Author of SpinKit),
@@ -48,6 +49,6 @@ Author: Aravind Hebbali [aut, cre],
   Hunter Perrin [ctb, cph] (Author of PNotify),
   Robin Parisi [ctb, cph] (Author of Tingle),
   Marcelo Dolza [ctb, cph] (Author of iziToast)
-Maintainer: Aravind Hebbali <hebbali.aravind@gmail.com>
+Maintainer: Aravind Hebbali <aravindhebbali@rsquaredacademy.com>
 Repository: CRAN
-Date/Publication: 2024-10-28 11:50:32 UTC
+Date/Publication: 2026-11-20 14:30:09 UTC
